@@ -9,15 +9,13 @@ from predictor.kmeans import KMeansModel
 
 @app.route('/getPredictions', methods=['GET', 'POST'])
 def add_message():
-    print(request.json)
     try:
         numbers = pd.json_normalize(request.json)
-        print(numbers)
-
         try:
             model = KMeansModel(n=4)
-            predictions = model.predict(numbers)
-            return json.dumps(predictions, ensure_ascii=False)
+            predictions = model.predict(numbers[["p", "n"]])
+            numbers["predictions"] = predictions
+            return json.dumps(numbers.to_json(orient='records'), ensure_ascii=False)
 
         except Exception:
             return internal_server_error()
